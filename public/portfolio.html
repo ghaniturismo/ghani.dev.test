@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Boursier</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#0f1117',
+            card:    '#1a1d27',
+            border:  '#2a2d3a',
+            accent:  '#6c63ff',
+            green:   '#00c896',
+            red:     '#ff4d6a',
+          },
+          fontFamily: { mono: ['JetBrains Mono', 'Fira Mono', 'monospace'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'JetBrains Mono', monospace; background: #0f1117; }
+    .card-hover { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(108,99,255,0.10); }
+    input:-webkit-autofill { -webkit-box-shadow: 0 0 0 30px #1a1d27 inset !important; -webkit-text-fill-color: #e2e8f0 !important; }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #1a1d27; } ::-webkit-scrollbar-thumb { background: #2a2d3a; border-radius: 3px; }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .live-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+    .spinner { border: 2px solid #2a2d3a; border-top-color: #6c63ff; border-radius: 50%; width: 14px; height: 14px; animation: spin .7s linear infinite; display:inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .fade-in { animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .tag { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 700; letter-spacing: .04em; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-200">
+
+<!-- ═══════════════════════  HEADER  ═══════════════════════ -->
+<header class="sticky top-0 z-50 border-b border-border bg-surface/90 backdrop-blur-md">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white font-bold text-sm">P</div>
+      <span class="font-bold text-lg tracking-tight text-white">PortfolioTracker</span>
+    </div>
+    <div class="flex items-center gap-2 text-xs text-slate-400">
+      <span class="live-dot w-2 h-2 rounded-full bg-green inline-block"></span>
+      <span id="last-update">En attente…</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+  <!-- ═══════════════════════  DASHBOARD GLOBAL  ═══════════════════════ -->
+  <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="bg-card border border-border rounded-2xl p-5 card-hover">
+      <p class="text-xs text-slate-400 uppercase tracking-widest mb-1">Valeur totale</p>
+      <p id="stat-total" class="text-3xl font-bold text-white">–</p>
+    </div>
+    <div class="bg-card border border-border rounded-2xl p-5 card-hover">
+      <p class="text-xs text-slate-400 uppercase tracking-widest mb-1">Plus-value latente</p>
+      <p id="stat-pnl" class="text-3xl font-bold">–</p>
+    </div>
+    <div class="bg-card border border-border rounded-2xl p-5 card-hover">
+      <p class="text-xs text-slate-400 uppercase tracking-widest mb-1">Perf. globale</p>
+      <p id="stat-pct" class="text-3xl font-bold">–</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════  FORMULAIRE D'AJOUT  ═══════════════════════ -->
+  <section class="bg-card border border-border rounded-2xl p-6">
+    <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-widest mb-4">Ajouter une position</h2>
+    <form id="add-form" class="flex flex-col sm:flex-row gap-3 items-end">
+      <div class="flex-1 space-y-1">
+        <label class="text-xs text-slate-400">Ticker</label>
+        <input id="f-ticker" type="text" placeholder="ex: AAPL" maxlength="10"
+          class="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-white uppercase placeholder:text-slate-600 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition" />
+      </div>
+      <div class="flex-1 space-y-1">
+        <label class="text-xs text-slate-400">Quantité</label>
+        <input id="f-qty" type="number" placeholder="ex: 10" min="0.0001" step="any"
+          class="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition" />
+      </div>
+      <div class="flex-1 space-y-1">
+        <label class="text-xs text-slate-400">PRU (prix de revient)</label>
+        <input id="f-pru" type="number" placeholder="ex: 145.50" min="0.0001" step="any"
+          class="w-full bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition" />
+      </div>
+      <button type="submit"
+        class="h-10 px-6 bg-accent hover:bg-purple-500 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2 whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Ajouter
+      </button>
+    </form>
+    <p id="form-error" class="mt-2 text-xs text-red hidden"></p>
+  </section>
+
+  <!-- ═══════════════════════  TABLEAU DES POSITIONS  ═══════════════════════ -->
+  <section>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-semibold text-slate-300 uppercase tracking-widest">Mes positions</h2>
+      <button id="btn-refresh" class="text-xs text-slate-400 hover:text-white border border-border hover:border-accent rounded-lg px-3 py-1.5 transition flex items-center gap-2">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Actualiser
+      </button>
+    </div>
+
+    <!-- Tableau desktop -->
+    <div class="hidden md:block bg-card border border-border rounded-2xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-border text-xs text-slate-500 uppercase tracking-widest">
+            <th class="text-left px-5 py-3">Ticker</th>
+            <th class="text-right px-5 py-3">Qté</th>
+            <th class="text-right px-5 py-3">PRU</th>
+            <th class="text-right px-5 py-3">Prix actuel</th>
+            <th class="text-right px-5 py-3">Var. jour</th>
+            <th class="text-right px-5 py-3">Valeur</th>
+            <th class="text-right px-5 py-3">P&L latent</th>
+            <th class="text-center px-5 py-3"></th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- lignes injectées dynamiquement -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cartes mobile -->
+    <div id="cards-container" class="md:hidden space-y-3"></div>
+
+    <!-- État vide -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center">
+      <svg class="w-12 h-12 text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      <p class="text-slate-500 text-sm">Aucune position. Ajoutez votre première action !</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════  CONFIG API KEY  ═══════════════════════ -->
+  <section class="bg-card border border-border rounded-2xl p-5">
+    <div class="flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        <p class="text-xs text-slate-400 uppercase tracking-widest mb-0.5">Clé API Finnhub</p>
+        <p class="text-xs text-slate-500">Laissée vide → données simulées (demo). <a href="https://finnhub.io/" target="_blank" class="text-accent underline">Obtenir une clé gratuite</a></p>
+      </div>
+      <div class="flex gap-2 items-center">
+        <input id="api-key-input" type="text" placeholder="Votre clé Finnhub…"
+          class="bg-surface border border-border rounded-xl px-4 py-2 text-xs text-white w-64 placeholder:text-slate-600 focus:outline-none focus:border-accent" />
+        <button id="btn-save-key" class="bg-accent hover:bg-purple-500 text-white text-xs font-semibold px-4 py-2 rounded-xl transition">Sauvegarder</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="text-center text-xs text-slate-600 py-6">
+  PortfolioTracker — données via <a href="https://finnhub.io" target="_blank" class="text-accent hover:underline">Finnhub</a> · stockage local uniquement
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ── CONFIG ──────────────────────────────────────────────
+const LS_KEY      = 'portfolio_positions';
+const LS_API_KEY  = 'portfolio_api_key';
+let   API_KEY     = localStorage.getItem(LS_API_KEY) || '';
+
+// ── MOCK DATA ────────────────────────────────────────────
+// Utilisé quand API_KEY est vide ou en cas d'erreur
+const MOCK_PRICES = {
+  AAPL:  { price: 213.49, change: 1.24,  pct: 0.58  },
+  MSFT:  { price: 415.32, change: -2.10, pct: -0.50 },
+  TSLA:  { price: 176.75, change: 5.45,  pct: 3.18  },
+  GOOGL: { price: 175.84, change: 0.92,  pct: 0.53  },
+  AMZN:  { price: 198.12, change: -1.55, pct: -0.78 },
+  NVDA:  { price: 875.60, change: 22.10, pct: 2.59  },
+  META:  { price: 507.23, change: 3.87,  pct: 0.77  },
+  BNP:   { price: 64.50,  change: -0.30, pct: -0.46 },
+};
+
+function getMockQuote(ticker) {
+  const base = MOCK_PRICES[ticker.toUpperCase()];
+  if (base) {
+    // légère randomisation pour simuler le live
+    const jitter = (Math.random() - 0.5) * 0.6;
+    return { price: +(base.price + jitter).toFixed(2), change: base.change, pct: base.pct };
+  }
+  // ticker inconnu : prix aléatoire
+  const price = +(50 + Math.random() * 450).toFixed(2);
+  const change = +((Math.random() - 0.5) * 6).toFixed(2);
+  return { price, change, pct: +((change / price) * 100).toFixed(2) };
+}
+
+// ── STATE ────────────────────────────────────────────────
+let positions = [];   // [{ id, ticker, qty, pru }]
+let quotes    = {};   // { ticker: { price, change, pct, loading } }
+
+// ── PERSISTENCE ──────────────────────────────────────────
+function load()  { try { positions = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { positions = []; } }
+function save()  { localStorage.setItem(LS_KEY, JSON.stringify(positions)); }
+
+// ── FETCH QUOTE ──────────────────────────────────────────
+async function fetchQuote(ticker) {
+  if (!API_KEY) return getMockQuote(ticker);
+  try {
+    const [q, c] = await Promise.all([
+      fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${API_KEY}`).then(r => r.json()),
+      fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${API_KEY}`).then(r => r.json()),
+    ]);
+    if (!q.c) return getMockQuote(ticker);
+    return { price: q.c, change: +(q.c - q.pc).toFixed(2), pct: +(((q.c - q.pc) / q.pc) * 100).toFixed(2) };
+  } catch { return getMockQuote(ticker); }
+}
+
+async function refreshAllQuotes() {
+  if (!positions.length) return;
+  setLastUpdate('Actualisation…');
+  const tickers = [...new Set(positions.map(p => p.ticker))];
+  await Promise.all(tickers.map(async t => {
+    quotes[t] = { ...quotes[t], loading: true };
+    render();
+    const q = await fetchQuote(t);
+    quotes[t] = { ...q, loading: false };
+  }));
+  render();
+  setLastUpdate('Mis à jour ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+}
+
+// ── FORMATTERS ───────────────────────────────────────────
+const fmt  = v => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(v);
+const fmtN = v => new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+const sign = v => v >= 0 ? '+' : '';
+const color = v => v >= 0 ? 'text-green' : 'text-red';
+
+function setLastUpdate(txt) { document.getElementById('last-update').textContent = txt; }
+
+// ── RENDER ───────────────────────────────────────────────
+function render() {
+  renderDashboard();
+  renderTable();
+  renderCards();
+  toggleEmpty();
+}
+
+function renderDashboard() {
+  let totalValue  = 0;
+  let totalCost   = 0;
+
+  for (const p of positions) {
+    const q = quotes[p.ticker];
+    if (!q || q.loading) continue;
+    totalValue += q.price * p.qty;
+    totalCost  += p.pru   * p.qty;
+  }
+
+  const pnl = totalValue - totalCost;
+  const pct = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
+
+  const hasData = Object.values(quotes).some(q => !q.loading);
+
+  el('stat-total').textContent = hasData ? fmt(totalValue) : '–';
+  el('stat-pnl').textContent   = hasData ? `${sign(pnl)}${fmt(pnl)}` : '–';
+  el('stat-pct').textContent   = hasData ? `${sign(pct)}${fmtN(pct)} %` : '–';
+  el('stat-pnl').className     = `text-3xl font-bold ${color(pnl)}`;
+  el('stat-pct').className     = `text-3xl font-bold ${color(pct)}`;
+}
+
+function renderTable() {
+  const tbody = el('table-body');
+  tbody.innerHTML = '';
+  for (const p of positions) {
+    const q   = quotes[p.ticker] || {};
+    const loading = q.loading;
+    const price   = q.price ?? null;
+    const pct     = q.pct   ?? 0;
+    const value   = price !== null ? price * p.qty : null;
+    const pnl     = price !== null ? (price - p.pru) * p.qty : null;
+
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr class="border-b border-border/60 hover:bg-white/[.02] transition fade-in" data-id="${p.id}">
+        <td class="px-5 py-4 font-bold text-white">${esc(p.ticker)}</td>
+        <td class="px-5 py-4 text-right text-slate-300">${fmtN(p.qty)}</td>
+        <td class="px-5 py-4 text-right text-slate-300">${fmt(p.pru)}</td>
+        <td class="px-5 py-4 text-right font-semibold text-white">${loading ? '<span class="spinner"></span>' : (price !== null ? fmt(price) : '–')}</td>
+        <td class="px-5 py-4 text-right">
+          ${loading ? '<span class="spinner"></span>' : `<span class="tag ${pct >= 0 ? 'bg-green/10 text-green' : 'bg-red/10 text-red'}">${sign(pct)}${fmtN(pct)}%</span>`}
+        </td>
+        <td class="px-5 py-4 text-right text-slate-300">${loading ? '…' : (value !== null ? fmt(value) : '–')}</td>
+        <td class="px-5 py-4 text-right font-semibold ${pnl !== null && !loading ? color(pnl) : 'text-slate-400'}">
+          ${loading ? '…' : (pnl !== null ? `${sign(pnl)}${fmt(pnl)}` : '–')}
+        </td>
+        <td class="px-5 py-4 text-center">
+          <button onclick="deletePosition('${p.id}')"
+            class="text-slate-500 hover:text-red transition p-1 rounded-lg hover:bg-red/10" title="Supprimer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </td>
+      </tr>
+    `);
+  }
+}
+
+function renderCards() {
+  const container = el('cards-container');
+  container.innerHTML = '';
+  for (const p of positions) {
+    const q       = quotes[p.ticker] || {};
+    const loading = q.loading;
+    const price   = q.price ?? null;
+    const pct     = q.pct   ?? 0;
+    const value   = price !== null ? price * p.qty : null;
+    const pnl     = price !== null ? (price - p.pru) * p.qty : null;
+
+    container.insertAdjacentHTML('beforeend', `
+      <div class="bg-card border border-border rounded-2xl p-4 card-hover fade-in" data-id="${p.id}">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-white text-base">${esc(p.ticker)}</span>
+            ${!loading && price !== null ? `<span class="tag ${pct >= 0 ? 'bg-green/10 text-green' : 'bg-red/10 text-red'}">${sign(pct)}${fmtN(pct)}%</span>` : ''}
+          </div>
+          <button onclick="deletePosition('${p.id}')"
+            class="text-slate-500 hover:text-red transition p-1 rounded-lg hover:bg-red/10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="bg-surface rounded-lg p-2"><p class="text-slate-500 mb-0.5">Prix actuel</p><p class="font-semibold text-white">${loading ? '<span class="spinner"></span>' : (price !== null ? fmt(price) : '–')}</p></div>
+          <div class="bg-surface rounded-lg p-2"><p class="text-slate-500 mb-0.5">Valeur</p><p class="font-semibold text-slate-200">${loading ? '…' : (value !== null ? fmt(value) : '–')}</p></div>
+          <div class="bg-surface rounded-lg p-2"><p class="text-slate-500 mb-0.5">Qté · PRU</p><p class="font-semibold text-slate-200">${fmtN(p.qty)} · ${fmt(p.pru)}</p></div>
+          <div class="bg-surface rounded-lg p-2"><p class="text-slate-500 mb-0.5">P&L latent</p><p class="font-semibold ${pnl !== null && !loading ? color(pnl) : 'text-slate-400'}">${loading ? '…' : (pnl !== null ? `${sign(pnl)}${fmt(pnl)}` : '–')}</p></div>
+        </div>
+      </div>
+    `);
+  }
+}
+
+function toggleEmpty() {
+  const empty = el('empty-state');
+  if (!positions.length) {
+    empty.classList.remove('hidden');
+    empty.classList.add('flex');
+  } else {
+    empty.classList.add('hidden');
+    empty.classList.remove('flex');
+  }
+}
+
+// ── ACTIONS ──────────────────────────────────────────────
+function addPosition(ticker, qty, pru) {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  positions.push({ id, ticker: ticker.toUpperCase(), qty: +qty, pru: +pru });
+  save();
+  refreshAllQuotes();
+}
+
+window.deletePosition = function(id) {
+  if (!confirm('Supprimer cette position ?')) return;
+  positions = positions.filter(p => p.id !== id);
+  save();
+  render();
+};
+
+// ── HELPERS ──────────────────────────────────────────────
+function el(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ── EVENTS ───────────────────────────────────────────────
+el('add-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const ticker = el('f-ticker').value.trim();
+  const qty    = parseFloat(el('f-qty').value);
+  const pru    = parseFloat(el('f-pru').value);
+  const errEl  = el('form-error');
+
+  if (!ticker)          return showErr('Le ticker est requis.');
+  if (!qty || qty <= 0) return showErr('La quantité doit être > 0.');
+  if (!pru || pru <= 0) return showErr('Le PRU doit être > 0.');
+
+  errEl.classList.add('hidden');
+  addPosition(ticker, qty, pru);
+  el('add-form').reset();
+});
+
+el('btn-refresh').addEventListener('click', refreshAllQuotes);
+
+el('btn-save-key').addEventListener('click', () => {
+  API_KEY = el('api-key-input').value.trim();
+  localStorage.setItem(LS_API_KEY, API_KEY);
+  refreshAllQuotes();
+  el('btn-save-key').textContent = '✓ Sauvegardé';
+  setTimeout(() => el('btn-save-key').textContent = 'Sauvegarder', 2000);
+});
+
+function showErr(msg) {
+  const errEl = el('form-error');
+  errEl.textContent = msg;
+  errEl.classList.remove('hidden');
+}
+
+// ── INIT ─────────────────────────────────────────────────
+(async function init() {
+  load();
+  // pré-remplir la clé API si déjà sauvegardée
+  el('api-key-input').value = API_KEY;
+  render();
+  await refreshAllQuotes();
+  // rafraîchissement automatique toutes les 30 secondes
+  setInterval(refreshAllQuotes, 30_000);
+})();
+</script>
+
+</body>
+</html>
+

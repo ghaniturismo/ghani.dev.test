@@ -1,0 +1,44 @@
+<mat-card class="form-card">
+  <mat-card-content>
+    <h2 class="form-card__title">
+      <mat-icon>add_circle_outline</mat-icon>
+      Ajouter une position
+    </h2>
+
+    <form (ngSubmit)="onSubmit()" class="form-row">
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Ticker</mat-label>
+        <input matInput [(ngModel)]="ticker" name="ticker"
+               placeholder="ex: AAPL" maxlength="10" style="text-transform:uppercase" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>Quantité</mat-label>
+        <input matInput [(ngModel)]="qty" name="qty"
+               type="number" placeholder="ex: 10" min="0.0001" step="any" />
+        <mat-icon matSuffix>tag</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="form-field">
+        <mat-label>PRU (prix de revient)</mat-label>
+        <input matInput [(ngModel)]="pru" name="pru"
+               type="number" placeholder="ex: 145.50" min="0.0001" step="any" />
+        <span matTextSuffix>$</span>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" class="submit-btn">
+        <mat-icon>add</mat-icon>
+        Ajouter
+      </button>
+    </form>
+
+    @if (error()) {
+      <p class="form-error">
+        <mat-icon>error_outline</mat-icon>
+        {{ error() }}
+      </p>
+    }
+  </mat-card-content>
+</mat-card>
+

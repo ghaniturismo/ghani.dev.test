@@ -1,0 +1,367 @@
+.ai-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// ── Key card Gemini ───────────────────────────────────────────────────────────
+.key-card {
+  border-color: rgba(124, 111, 255, 0.4) !important;
+  background: rgba(124, 111, 255, 0.05) !important;
+
+  mat-card-content { padding: 20px 24px !important; }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  &__icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--color-accent), #a855f7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon { color: #fff; font-size: 20px; }
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 4px;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: var(--color-muted);
+    margin: 0;
+
+    a {
+      color: var(--color-accent);
+      text-decoration: none;
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  &__form {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  &__note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-muted);
+    margin: 0;
+    opacity: 0.7;
+
+    mat-icon { font-size: 13px; width: 13px; height: 13px; }
+  }
+}
+
+.key-field {
+  flex: 1;
+  min-width: 220px;
+
+  ::ng-deep {
+    .mdc-text-field--filled { background: var(--color-surface) !important; }
+    .mdc-floating-label { color: var(--color-muted) !important; }
+    input { color: var(--color-text) !important; font-family: 'JetBrains Mono', monospace !important; font-size: 12px !important; }
+    .mdc-line-ripple::before { border-bottom-color: var(--color-border) !important; }
+    .mdc-line-ripple::after  { border-bottom-color: var(--color-accent) !important; }
+    .mat-mdc-form-field-focus-overlay { background: transparent !important; }
+  }
+}
+
+.key-btn {
+  height: 56px;
+  padding: 0 20px;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, var(--color-accent), #a855f7) !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.settings-btn {
+  color: var(--color-muted) !important;
+  &:hover { color: var(--color-text) !important; }
+}
+
+// ── Sélection prompt ──────────────────────────────────────────────────────────
+.prompt-selector {
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    margin: 0 0 12px;
+
+    mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  }
+}
+
+.prompt-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prompt-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+
+  &:hover {
+    border-color: var(--color-accent);
+    background: rgba(124, 111, 255, 0.05);
+  }
+
+  &--active {
+    border-color: var(--color-accent) !important;
+    background: rgba(124, 111, 255, 0.1) !important;
+
+    .prompt-card__icon { color: var(--color-accent); }
+    .prompt-card__name { color: var(--color-accent); }
+  }
+
+  &__icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--color-muted);
+    margin-top: 2px;
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  &__name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+    transition: color 0.2s;
+  }
+
+  &__desc {
+    font-size: 11px;
+    color: var(--color-muted);
+    line-height: 1.4;
+  }
+}
+
+// ── Formulaire ────────────────────────────────────────────────────────────────
+.search-card {
+  mat-card-content { padding: 20px 24px !important; }
+}
+
+.search-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.ticker-field {
+  flex: 1;
+  min-width: 160px;
+
+  ::ng-deep {
+    .mdc-text-field--filled { background: var(--color-surface) !important; }
+    .mdc-floating-label { color: var(--color-muted) !important; }
+    input {
+      color: var(--color-text) !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      text-transform: uppercase;
+    }
+    .mdc-line-ripple::before { border-bottom-color: var(--color-border) !important; }
+    .mdc-line-ripple::after  { border-bottom-color: var(--color-accent) !important; }
+    .mat-mdc-form-field-focus-overlay { background: transparent !important; }
+  }
+}
+
+.analyze-btn {
+  height: 56px;
+  padding: 0 24px;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, var(--color-accent), #a855f7) !important;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+
+  &[disabled] { opacity: 0.6 !important; }
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+.btn-spinner {
+  display: inline-block;
+  ::ng-deep circle { stroke: #fff !important; }
+}
+
+.form-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--color-red);
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  gap: 16px;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 14px;
+  }
+
+  ::ng-deep circle { stroke: var(--color-accent) !important; }
+}
+
+.loading-hint {
+  font-size: 11px !important;
+  color: var(--color-muted) !important;
+}
+
+// ── Résultat ──────────────────────────────────────────────────────────────────
+.result-card {
+  mat-card-content { padding: 0 !important; }
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    color: var(--color-accent);
+  }
+
+  &__title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-muted);
+    margin: 0 0 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__ticker {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+  }
+}
+
+.result-body {
+  padding: 24px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--color-text);
+  max-height: 70vh;
+  overflow-y: auto;
+
+  ::ng-deep {
+    h1, h2, h3 {
+      color: #fff;
+      margin: 20px 0 8px;
+      font-weight: 700;
+    }
+    h1 { font-size: 18px; }
+    h2 { font-size: 16px; color: var(--color-accent); }
+    h3 { font-size: 14px; color: #c4b5fd; }
+
+    p { margin: 8px 0; }
+
+    ul {
+      padding-left: 20px;
+      margin: 8px 0;
+    }
+
+    li { margin: 4px 0; color: var(--color-text); }
+
+    strong { color: #fff; font-weight: 700; }
+
+    em { color: var(--color-accent); font-style: normal; }
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--color-muted);
+  gap: 12px;
+
+  mat-icon {
+    font-size: 52px;
+    width: 52px;
+    height: 52px;
+    opacity: 0.3;
+  }
+
+  p { margin: 0; font-size: 13px; }
+
+  &__hint {
+    font-size: 11px !important;
+    opacity: 0.6;
+  }
+}
+
+

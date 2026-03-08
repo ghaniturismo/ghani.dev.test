@@ -1,0 +1,118 @@
+@use '@angular/material' as mat;
+
+// ─── Palette sombre custom ────────────────────────────────────────────────────
+$portfolio-primary: mat.m2-define-palette(mat.$m2-deep-purple-palette, 400, 200, 700);
+$portfolio-accent:  mat.m2-define-palette(mat.$m2-teal-palette, A200, A100, A400);
+$portfolio-warn:    mat.m2-define-palette(mat.$m2-red-palette, 400);
+
+$portfolio-theme: mat.m2-define-dark-theme((
+  color: (
+    primary: $portfolio-primary,
+    accent:  $portfolio-accent,
+    warn:    $portfolio-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: "'JetBrains Mono', 'Fira Mono', monospace",
+  ),
+  density: 0,
+));
+
+@include mat.all-component-themes($portfolio-theme);
+
+// ─── Google Fonts ─────────────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+// ─── Reset & base ─────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: #0d0f17;
+  color: #e2e8f0;
+  font-family: 'JetBrains Mono', 'Fira Mono', monospace;
+}
+
+// ─── Variables CSS ────────────────────────────────────────────────────────────
+:root {
+  --color-bg:       #0d0f17;
+  --color-surface:  #13151f;
+  --color-card:     #1a1d2e;
+  --color-border:   #2a2d3e;
+  --color-accent:   #7c6fff;
+  --color-green:    #00d68f;
+  --color-red:      #ff4d6a;
+  --color-muted:    #64748b;
+  --color-text:     #e2e8f0;
+}
+
+// ─── Scrollbar ────────────────────────────────────────────────────────────────
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: var(--color-surface); }
+::-webkit-scrollbar-thumb  { background: var(--color-border); border-radius: 3px; }
+
+// ─── Autofill dark ────────────────────────────────────────────────────────────
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px var(--color-card) inset !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+// ─── Overrides Angular Material ───────────────────────────────────────────────
+.mat-mdc-card {
+  background: var(--color-card) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+.mat-mdc-form-field {
+  .mdc-text-field--filled {
+    background: var(--color-surface) !important;
+    border-radius: 10px !important;
+  }
+  .mdc-line-ripple::before { border-color: var(--color-border) !important; }
+}
+
+.mat-mdc-snack-bar-container {
+  &.snack-success .mdc-snackbar__surface { background: #1a3a2a; border: 1px solid var(--color-green); }
+  &.snack-error   .mdc-snackbar__surface { background: #3a1a1f; border: 1px solid var(--color-red); }
+}
+
+// ─── Helpers globaux ──────────────────────────────────────────────────────────
+.text-green  { color: var(--color-green) !important; }
+.text-red    { color: var(--color-red) !important; }
+.text-muted  { color: var(--color-muted) !important; }
+
+.chip-up {
+  background: rgba(0, 214, 143, 0.12);
+  color: var(--color-green);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.chip-down {
+  background: rgba(255, 77, 106, 0.12);
+  color: var(--color-red);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+// ─── Animations ───────────────────────────────────────────────────────────────
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.fade-slide-in { animation: fadeSlideIn .3s ease forwards; }
+

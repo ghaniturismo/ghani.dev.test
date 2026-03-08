@@ -1,0 +1,112 @@
+<div class="table-section">
+  <div class="table-section__header">
+    <h2 class="table-section__title">
+      <mat-icon>bar_chart</mat-icon>
+      Mes positions
+    </h2>
+    <button mat-stroked-button (click)="refresh.emit()" class="refresh-btn">
+      <mat-icon>refresh</mat-icon>
+      Actualiser
+    </button>
+  </div>
+
+  <!-- État vide -->
+  @if (rows().length === 0) {
+    <div class="empty-state">
+      <mat-icon class="empty-state__icon">inbox</mat-icon>
+      <p class="empty-state__text">Aucune position pour le moment.</p>
+      <p class="empty-state__sub">Ajoutez votre première action via le formulaire ci-dessus.</p>
+    </div>
+  }
+
+  <!-- Tableau -->
+  @if (rows().length > 0) {
+    <mat-card class="table-card">
+      <table mat-table [dataSource]="rows()" class="portfolio-table">
+
+        <!-- Ticker -->
+        <ng-container matColumnDef="ticker">
+          <th mat-header-cell *matHeaderCellDef>Ticker</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="ticker-badge">{{ row.ticker }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Quantité -->
+        <ng-container matColumnDef="qty">
+          <th mat-header-cell *matHeaderCellDef class="col-right">Quantité</th>
+          <td mat-cell *matCellDef="let row" class="col-right muted">{{ row.qty | num2:4 }}</td>
+        </ng-container>
+
+        <!-- PRU -->
+        <ng-container matColumnDef="pru">
+          <th mat-header-cell *matHeaderCellDef class="col-right">PRU</th>
+          <td mat-cell *matCellDef="let row" class="col-right muted">{{ row.pru | currency2 }}</td>
+        </ng-container>
+
+        <!-- Prix actuel -->
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef class="col-right">Prix actuel</th>
+          <td mat-cell *matCellDef="let row" class="col-right bold">
+            @if (row.quote?.loading) {
+              <mat-spinner diameter="14"></mat-spinner>
+            } @else {
+              {{ row.quote ? (row.quote.price | currency2) : '–' }}
+            }
+          </td>
+        </ng-container>
+
+        <!-- Variation jour -->
+        <ng-container matColumnDef="dayChange">
+          <th mat-header-cell *matHeaderCellDef class="col-right">Var. jour</th>
+          <td mat-cell *matCellDef="let row" class="col-right">
+            @if (row.quote?.loading) {
+              <mat-spinner diameter="14"></mat-spinner>
+            } @else if (row.quote) {
+              <span [class]="row.quote.pct >= 0 ? 'chip-up' : 'chip-down'">
+                {{ row.quote.pct | signedPct }}
+              </span>
+            } @else { – }
+          </td>
+        </ng-container>
+
+        <!-- Valeur -->
+        <ng-container matColumnDef="value">
+          <th mat-header-cell *matHeaderCellDef class="col-right">Valeur</th>
+          <td mat-cell *matCellDef="let row" class="col-right muted">
+            @if (row.quote?.loading) { … }
+            @else { {{ row.value | currency2 }} }
+          </td>
+        </ng-container>
+
+        <!-- P&L latent -->
+        <ng-container matColumnDef="pnl">
+          <th mat-header-cell *matHeaderCellDef class="col-right">P&amp;L latent</th>
+          <td mat-cell *matCellDef="let row" class="col-right bold" [class]="pnlClass(row.pnl)">
+            @if (row.quote?.loading) { … }
+            @else {
+              <span [matTooltip]="row.pnlPct !== null ? (row.pnlPct | signedPct) : ''">
+                {{ row.pnl | signedCurrency }}
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let row" class="col-center">
+            <button mat-icon-button class="delete-btn"
+                    matTooltip="Supprimer" (click)="onDelete(row.id)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns;" class="table-row"></tr>
+      </table>
+    </mat-card>
+  }
+</div>
+

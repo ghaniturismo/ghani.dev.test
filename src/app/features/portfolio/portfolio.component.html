@@ -1,0 +1,89 @@
+<app-header [lastUpdate]="lastUpdate()" />
+
+<div class="app-layout">
+
+  <!-- ══ Sidebar navigation ══════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <nav class="sidebar__nav">
+      @for (item of navItems; track item.id) {
+        <button
+          class="nav-item"
+          [class.nav-item--active]="activeView() === item.id"
+          (click)="activeView.set(item.id)"
+          [matTooltip]="item.label"
+          matTooltipPosition="right">
+          <mat-icon class="nav-item__icon">{{ item.icon }}</mat-icon>
+          <span class="nav-item__label">{{ item.label }}</span>
+        </button>
+      }
+    </nav>
+
+    <div class="sidebar__footer">
+      <div class="sidebar__version">v1.0</div>
+    </div>
+  </aside>
+
+  <!-- ══ Contenu principal ═══════════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- ── Vue Portfolio ─────────────────────────────────────────── -->
+    @if (activeView() === 'portfolio') {
+      <div class="view-enter">
+        <!-- Stats globales -->
+        <app-dashboard-stats [stats]="portfolioService.stats()" />
+
+        <!-- Formulaire d'ajout -->
+        <app-add-position-form (addPosition)="onAdd($event)" />
+
+        <!-- Tableau des positions -->
+        <app-positions-table
+          [rows]="portfolioService.rows()"
+          (refresh)="refreshAll()"
+          (delete)="portfolioService.removePosition($event)" />
+
+        <!-- Config API -->
+        <mat-card class="api-card">
+          <mat-card-content>
+            <div class="api-card__inner">
+              <div class="api-card__info">
+                <p class="api-card__label">
+                  <mat-icon>vpn_key</mat-icon>
+                  Clé API Finnhub
+                </p>
+                <p class="api-card__hint">
+                  Laissée vide → données simulées.
+                  <a href="https://finnhub.io/" target="_blank" rel="noopener">Clé gratuite →</a>
+                </p>
+              </div>
+              <div class="api-card__actions">
+                <mat-form-field appearance="fill" class="api-input">
+                  <mat-label>Clé Finnhub</mat-label>
+                  <input matInput [(ngModel)]="apiKeyInput" type="password" />
+                  <mat-icon matSuffix>lock</mat-icon>
+                </mat-form-field>
+                <button mat-flat-button color="primary" (click)="saveApiKey()" class="save-btn">
+                  {{ apiKeySaved() ? '✓ Sauvegardé' : 'Sauvegarder' }}
+                </button>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    }
+
+    <!-- ── Vue Analyse IA ─────────────────────────────────────────── -->
+    @if (activeView() === 'ai') {
+      <div class="view-enter">
+        <app-ai-analysis />
+      </div>
+    }
+
+  </main>
+</div>
+
+<footer class="footer">
+  PortfolioTracker · <a href="https://finnhub.io" target="_blank" rel="noopener">Finnhub</a>
+  · IA par <a href="https://pollinations.ai" target="_blank" rel="noopener">Pollinations AI</a>
+  · 100% local
+</footer>
+

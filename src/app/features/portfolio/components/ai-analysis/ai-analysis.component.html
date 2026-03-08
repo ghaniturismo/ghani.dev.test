@@ -1,0 +1,154 @@
+<div class="ai-page">
+
+  <!-- ── Setup clé Gemini ─────────────────────────────────────────────── -->
+  @if (showKeySetup()) {
+    <mat-card class="key-card">
+      <mat-card-content>
+        <div class="key-card__header">
+          <div class="key-card__icon-wrap">
+            <mat-icon>key</mat-icon>
+          </div>
+          <div>
+            <p class="key-card__title">Clé API Gemini requise</p>
+            <p class="key-card__sub">
+              Gratuit · Gemini 2.0 Flash ·
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">
+                Obtenir une clé sur Google AI Studio →
+              </a>
+            </p>
+          </div>
+        </div>
+        <div class="key-card__form">
+          <mat-form-field appearance="fill" class="key-field">
+            <mat-label>Clé API Gemini</mat-label>
+            <input matInput [(ngModel)]="geminiKeyInput" type="password" placeholder="AIza..." />
+            <mat-icon matSuffix>lock</mat-icon>
+          </mat-form-field>
+          <button mat-flat-button color="primary" class="key-btn" (click)="saveGeminiKey()">
+            {{ geminiKeySaved() ? '✓ Sauvegardée' : 'Sauvegarder' }}
+          </button>
+        </div>
+        <p class="key-card__note">
+          <mat-icon>info</mat-icon>
+          Stockée uniquement dans votre navigateur (localStorage). Jamais envoyée à un tiers.
+        </p>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- ── Sélection du prompt ──────────────────────────────────────────── -->
+  <div class="prompt-selector">
+    <p class="prompt-selector__label">
+      <mat-icon>psychology</mat-icon>
+      Choisir une analyse
+    </p>
+    <div class="prompt-cards">
+      @for (p of prompts; track p.id) {
+        <button
+          class="prompt-card"
+          [class.prompt-card--active]="selectedPrompt().id === p.id"
+          (click)="selectPrompt(p)">
+          <mat-icon class="prompt-card__icon">{{ p.icon }}</mat-icon>
+          <div class="prompt-card__text">
+            <span class="prompt-card__name">{{ p.label }}</span>
+            <span class="prompt-card__desc">{{ p.description }}</span>
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── Formulaire ───────────────────────────────────────────────────── -->
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="search-row">
+        <mat-form-field appearance="fill" class="ticker-field">
+          <mat-label>Ticker</mat-label>
+          <input
+            matInput
+            [ngModel]="ticker()"
+            (ngModelChange)="ticker.set($event)"
+            placeholder="ex: AAPL, TSLA, NVDA"
+            (keydown.enter)="analyze()"
+            maxlength="10"
+            style="text-transform:uppercase" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <button
+          mat-flat-button
+          color="primary"
+          class="analyze-btn"
+          [disabled]="loading()"
+          (click)="analyze()">
+          @if (loading()) {
+            <ng-container>
+              <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+              Analyse en cours…
+            </ng-container>
+          } @else {
+            <ng-container>
+              <mat-icon>auto_awesome</mat-icon>
+              Analyser avec Gemini
+            </ng-container>
+          }
+        </button>
+
+        @if (aiService.geminiKey()) {
+          <button mat-icon-button (click)="showKeySetup.set(!showKeySetup())"
+                  matTooltip="Changer la clé API" class="settings-btn">
+            <mat-icon>settings</mat-icon>
+          </button>
+        }
+      </div>
+
+      @if (error()) {
+        <p class="form-error">
+          <mat-icon>error_outline</mat-icon>
+          {{ error() }}
+        </p>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ── Loading ──────────────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Gemini analyse <strong>{{ ticker().toUpperCase() }}</strong>…</p>
+      <p class="loading-hint">Cela peut prendre quelques secondes.</p>
+    </div>
+  }
+
+  <!-- ── Résultat ─────────────────────────────────────────────────────── -->
+  @if (result() && !loading()) {
+    <mat-card class="result-card">
+      <mat-card-content>
+        <div class="result-header">
+          <div class="result-header__left">
+            <mat-icon class="result-header__icon">auto_awesome</mat-icon>
+            <div>
+              <p class="result-header__title">{{ selectedPrompt().label }}</p>
+              <p class="result-header__ticker">{{ ticker().toUpperCase() }}</p>
+            </div>
+          </div>
+          <button mat-icon-button (click)="result.set('')" matTooltip="Fermer">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="result-body" [innerHTML]="formatResult(result())"></div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- ── Empty state ──────────────────────────────────────────────────── -->
+  @if (!result() && !loading()) {
+    <div class="empty-state">
+      <mat-icon>insights</mat-icon>
+      <p>Sélectionnez un type d'analyse, saisissez un ticker et lancez Gemini.</p>
+      <p class="empty-state__hint">Propulsé par Gemini 2.0 Flash · Gratuit · Stockage local uniquement</p>
+    </div>
+  }
+
+</div>
+
